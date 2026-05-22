@@ -1,0 +1,40 @@
+name: Daily Evolution
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout engine repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install engine dependencies
+        run: npm install
+
+      - name: Run daily evolution cycle
+        run: npm run engine:run
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_BASE_URL: ${{ secrets.DEEPSEEK_BASE_URL }}
+          DEEPSEEK_MODEL: ${{ secrets.DEEPSEEK_MODEL }}
+          GITLAB_ACCESS_TOKEN: ${{ secrets.GITLAB_ACCESS_TOKEN }}
+          GITLAB_PROJECT_ID: ${{ secrets.GITLAB_PROJECT_ID }}
+          GITLAB_TARGET_BRANCH: ${{ secrets.GITLAB_TARGET_BRANCH }}
+          TARGET_REPO_CLONE_URL: ${{ secrets.TARGET_REPO_CLONE_URL }}
+          TARGET_APP_SUBDIR: ${{ secrets.TARGET_APP_SUBDIR }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          ENGINE_RUN_DIR: .engine-workspace
+          COMMITTER_NAME: AI Dev Loop Engine
+          COMMITTER_EMAIL: bot@example.com
+          MAX_FILES_PER_CYCLE: 3
+          MAX_FILE_BYTES: 40000
